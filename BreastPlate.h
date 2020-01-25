@@ -16,7 +16,8 @@ public:
 	~BreastPlate() {};
 
 	virtual string getName() const { return name; };
-	virtual void getLook(sf::Texture&, sf::Sprite&) const;
+	virtual void getLook();
+	virtual BreastPlate* copyItems() const { return new BreastPlate(*this); };
 };
 
 #endif

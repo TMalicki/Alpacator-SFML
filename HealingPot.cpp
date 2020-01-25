@@ -1,12 +1,12 @@
 #include "Potion.h"
 #include "HealingPot.h"
 
-void HealingPot::getLook(sf::Texture& texture, sf::Sprite& sprite) const
+void HealingPot::getLook()
 {
 	// TODO: insert return statement here
-	if (name == "Carrot Sword") texture.loadFromFile("images/carrotSword.png");
+	if (name == "Health Potion") TItem.loadFromFile("images/healthPotion.png");
 
 
-	sprite.setTexture(texture);
-	sprite.setOrigin(25, 25);
+	SItem.setTexture(TItem);
+	SItem.setOrigin(25, 25);
 }

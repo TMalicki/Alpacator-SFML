@@ -4,6 +4,7 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include "Items.h"
+#include <string>
 
 // character - name, lvl, experience, strength, defence, agility, coord, hp
 // inherited class Rogue, Tank, Warrior
@@ -26,6 +27,9 @@ protected:
 
 	sf::Texture THero;
 	sf::Sprite SHero;
+
+	sf::Text StatInfo;
+	sf::Font font;
 public:
 	Hero(string n, string prof = "None", int h = 0, int s = 0, int d = 0, int agil = 0, int stam = 0) : name(n), lvl(1), experience(0), hp(h), strength(s), defence(d), agillity(agil), stamina(stam), profession(prof) {};
 	virtual ~Hero() {};
@@ -53,6 +57,7 @@ public:
 	Hero* ChooseProfession(sf::RenderWindow&, sf::Event&, sf::Texture&, sf::Sprite&, sf::Texture&, sf::Sprite&, sf::Texture&, sf::Sprite&, sf::Texture&, sf::Sprite&, sf::Texture&, sf::Sprite&);
 	void getFromChest(vector<Items*>);
 	vector<Items*> openBackpack();
+	sf::Text printStats();
 	//void HeroChooseWheel(sf::Sprite&, int, int, int);
 };
 

@@ -16,7 +16,8 @@ public:
 	~StaminaPot() {};
 
 	virtual string getName() const { return name; };
-	virtual void getLook(sf::Texture&, sf::Sprite&) const;
+	virtual void getLook();
+	virtual StaminaPot* copyItems() const { return new StaminaPot(*this); };
 };
 
 #endif

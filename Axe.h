@@ -16,7 +16,9 @@ public:
 	~Axe() {};
 
 	virtual string getName() const { return name; };
-	virtual void getLook(sf::Texture&, sf::Sprite&) const;
+	virtual void getLook();
+	virtual Axe* copyItems() const { return new Axe(*this); };
+
 };
 
 #endif

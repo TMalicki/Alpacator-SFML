@@ -16,7 +16,8 @@ public:
 	~Dagger() {};
 
 	virtual string getName() const { return name; };
-	virtual void getLook(sf::Texture&, sf::Sprite&) const;
+	virtual void getLook();
+	virtual Dagger* copyItems() const { return new Dagger(*this); };
 };
 
 #endif

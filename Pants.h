@@ -16,7 +16,8 @@ public:
 	~Pants() {};
 
 	virtual string getName() const { return name; };
-	virtual void getLook(sf::Texture&, sf::Sprite&) const;
+	virtual void getLook();
+	virtual Pants* copyItems() const { return new Pants(*this); };
 };
 
 #endif

@@ -15,6 +15,9 @@
 #include "HealingPot.h"
 #include "StaminaPot.h"
 #include "Chest.h"
+#include "Monsters.h"
+#include "Troll.h"
+#include "Ball.h"
 #include <list>
 
 using namespace std;
@@ -33,33 +36,26 @@ private:
 	Map Map;					// class App has class Map
 	Hero* Hero;					// class App has class Hero
 	list<Chests> Chest;		// class App has container of chests
+	list<Monsters*> Monster;
 
 	/// SPRITES ///////////
 	// startScreen sprite
 	sf::Sprite StartScreen;
-	// Wall sprite
-	///sf::Texture TWall;			///
-	///vector<sf::Sprite> SWall;	///
-	// Floor sprite
-	///sf::Texture TFloor;	///
-	///sf::Sprite SFloor;	///
-	// Hero sprite
-	///sf::Texture THero;	///
-	///sf::Sprite SHero;	///
+	// bar with hero stats
+	sf::Texture THeroBarStats;
+	sf::Sprite SHeroBarStats;
 	// profession of hero sprites
 	sf::Texture TProf1, TProf2, TProf3, TProf4, TProf5;
 	sf::Sprite SProf1, SProf2, SProf3, SProf4, SProf5;
-	// Chest sprites
-	//sf::Texture TChest;
-	//vector<sf::Sprite> SChest;
 	// backpack (not items) sprite
 	sf::Texture TInventory;
 	sf::Sprite SInventory;
-	// vector of items stored in backpack
-	vector<sf::Texture> THeroItems;
-	vector<sf::Sprite> SHeroItems;
-	// not sprite but drawable object
-	sf::RectangleShape ShighlightItem;	// highlite square for item
+	// not sprite but drawable objects
+	sf::RectangleShape ShighlightItem;	// highlighte square for item
+	sf::RectangleShape EquippedItem;	// square for equipped items
+	// 
+	sf::Text StatInfo;
+	sf::Font font;
 	/// //////////////////////
 
 	bool inventory_open;
@@ -77,14 +73,24 @@ private:
 	int potNumItems;
 
 	int chestAmount;			// amount of chests
+	int monsterAmount;
+
+	/// ////////////////////////
+	//int totalHeroAtk;
+	//int totalHeroDef;
+	//int totalHeroAgil;
 public:
 
 	// default constructor
-	App() : global_x(800), global_y(600), squarePixSize(50), gameOver(1), inventory_open(0), xPosItem(438), yPosItem(355) 
+	App() : global_x(800), global_y(600), squarePixSize(50), gameOver(1), inventory_open(0), xPosItem(438), yPosItem(356) 
 	{
 		ShighlightItem.setSize(sf::Vector2f(40, 40));
 		ShighlightItem.setOrigin(sf::Vector2f(20, 20));
 		ShighlightItem.setFillColor(sf::Color::Magenta);
+
+		EquippedItem.setSize(sf::Vector2f(40, 40));
+		EquippedItem.setOrigin(sf::Vector2f(20, 20));
+		EquippedItem.setFillColor(sf::Color::Green);
 	};
 	~App() {};
 
@@ -92,6 +98,18 @@ public:
 	void game(sf::RenderWindow&, sf::Event&);
 	void startGame(sf::RenderWindow&, sf::Event&);
 	void getArrowKey(int*);
+	void drawEverything(sf::RenderWindow&);
+
+	bool collision(::Map&, int, ::Hero*);
+	bool collision(::list<Chests>::iterator&, ::Hero*);
+	bool collision(::Map&, int, ::list<Chests>::iterator&);
+	bool collision(::list<Chests>::iterator&, ::list<Chests>::iterator&);
+	bool collision(::Items*, ::sf::RectangleShape&);
+
+	bool collision(::Map&, int, ::list<Monsters*>::iterator&);
+	bool collision(::list<Monsters*>::iterator&, ::Hero*);
+	bool collision(::list<Chests>::iterator&, ::list<Monsters*>::iterator&);
+	bool collision(::list<Monsters*>::iterator&, ::list<Monsters*>::iterator&);
 	//void startGame();
 	//void Generate_Intro() { cout << "Loading map..."; map.Get_intro_map(); system("cls"); map.map_disp(); }
 	//void Generate_Lvl1() { cout << "Loading map..."; map.Get_lvl1_map(); system("cls"); map.map_disp(); };	// generate map of exact lvl (make this chosen lvl - not only first)
@@ -100,24 +118,19 @@ public:
 	//void Generate_Stairs();											// generate stairs on the map
 
 	// HERO /////////////////////////////////////////////////////////////////////////////////
-	//void Hero_Maker();
-	//void Move();
-	bool collision(::Map&, int, ::Hero*);
-	bool collision(::list<Chests>::iterator&, ::Hero*);
-	bool collision(::Map&, int, ::list<Chests>::iterator&);
-	bool collision(::list<Chests>::iterator&, ::list<Chests>::iterator&);
-
 	void Generate_Hero();
 	void open_inventory();
 	void quit_inventory();
-	//bool collisionDetect();
-	//void chestOpen();
+	void printStats(sf::RenderWindow&);
+	void changeHeroStat(Items*, char);
+	void fighting(sf::RenderWindow&, Monsters*);
 	/////////////////////////////////////////////////////////////////////////////////////////
 
 	// CHESTS ///////////////////////////////////////////////////////////////////////////////
 	void set_chestAmount(int x) { chestAmount = x; };				// set chests amount
 	int get_chestAmount() const { return chestAmount; };			// get chests amount
 	void Generate_Chests();										// generate chests on the map
+	void HeroStatBar();
 	/////////////////////////////////////////////////////////////////////////////////////////
 
 	// ITEMS ////////////////////////////////////////////////////////////////////////////////
@@ -130,6 +143,12 @@ public:
 	int get_defNumItems() { return defNumItems; };
 	int get_potNumItems() { return potNumItems; };
 	//void makeItem(string name, a, d, ag, dur);
+	/////////////////////////////////////////////////////////////////////////////////////////
+
+	// MONSTERS /////////////////////////////////////////////////////////////////////////////
+	void Generate_Monsters(int lvl);
+	void set_monstersAmount(int x) { monsterAmount = x; };				// set chests amount
+	int get_monstersAmount() const { return monsterAmount; };			// get chests amount
 	/////////////////////////////////////////////////////////////////////////////////////////
 
 };

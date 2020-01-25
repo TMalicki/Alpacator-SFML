@@ -1,12 +1,12 @@
 #include "Potion.h"
 #include "StaminaPot.h"
 
-void StaminaPot::getLook(sf::Texture& texture, sf::Sprite& sprite) const
+void StaminaPot::getLook()
 {
 	// TODO: insert return statement here
-	if (name == "Carrot Sword") texture.loadFromFile("images/carrotSword.png");
+	if (name == "Mana Potion") TItem.loadFromFile("images/manaPotion.png");
 
 
-	sprite.setTexture(texture);
-	sprite.setOrigin(25, 25);
+	SItem.setTexture(TItem);
+	SItem.setOrigin(25, 25);
 }

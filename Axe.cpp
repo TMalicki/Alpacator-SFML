@@ -1,12 +1,12 @@
 #include "Weapon.h"
 #include "Axe.h"
 
-void Axe::getLook(sf::Texture& texture, sf::Sprite& sprite) const
+void Axe::getLook()
 {
 	// TODO: insert return statement here
-	if (name == "Mjolnir") texture.loadFromFile("images/mjolnir.png");
+	if (name == "Mjolnir") TItem.loadFromFile("images/mjolnir.png");
 
 
-	sprite.setTexture(texture);
-	sprite.setOrigin(25, 25);
+	SItem.setTexture(TItem);
+	SItem.setOrigin(25, 25);
 }

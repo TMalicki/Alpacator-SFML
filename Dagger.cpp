@@ -1,12 +1,13 @@
 #include "Weapon.h"
 #include "Dagger.h"
 
-void Dagger::getLook(sf::Texture& texture, sf::Sprite& sprite) const
+void Dagger::getLook()
 {
 	// TODO: insert return statement here
-	if (name == "Carrot Sword") texture.loadFromFile("images/carrotSword.png");
+	if (name == "Carrot Sword") TItem.loadFromFile("images/carrotSword.png");
 
-
-	sprite.setTexture(texture);
-	sprite.setOrigin(25, 25);
+	
+	SItem.setTexture(TItem);
+	SItem.setOrigin(25, 25);
 }
+

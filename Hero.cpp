@@ -361,6 +361,20 @@ vector<Items*> Hero::openBackpack()
 {
 	return this->items;
 }
+sf::Text Hero::printStats()
+{
+		font.loadFromFile("fonts/QuiteMagical.ttf");
+		StatInfo.setFont(font);
+		StatInfo.setCharacterSize(20);
+
+		//this->getDefence();
+		//StatInfo.setString(this.getName());
+		StatInfo.setString(to_string(this->getStrength()));
+		StatInfo.setOrigin(0, 10);
+		StatInfo.setPosition(120, 600);
+	
+	return StatInfo;
+}
 /*
 void Hero::HeroChooseWheel(sf::Sprite& sprite, int dx, int midX, int midY)
 {

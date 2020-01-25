@@ -17,7 +17,8 @@ public:
 
 	virtual string getType() const { return type; };
 	virtual string getName() const = 0;
-	virtual void getLook(sf::Texture&, sf::Sprite&) const = 0;
+	virtual void getLook() = 0;
+	virtual Weapon* copyItems() const = 0;
 };
 
 #endif 

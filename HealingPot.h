@@ -16,7 +16,8 @@ public:
 	~HealingPot() {};
 
 	virtual string getName() const { return name; };
-	virtual void getLook(sf::Texture&, sf::Sprite&) const;
+	virtual void getLook();
+	virtual HealingPot* copyItems() const { return new HealingPot(*this); };
 };
 
 #endif
