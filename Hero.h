@@ -23,6 +23,9 @@ protected:
 	int stamina;
 	string profession;
 	vector<Items*> items;
+
+	sf::Texture THero;
+	sf::Sprite SHero;
 public:
 	Hero(string n, string prof = "None", int h = 0, int s = 0, int d = 0, int agil = 0, int stam = 0) : name(n), lvl(1), experience(0), hp(h), strength(s), defence(d), agillity(agil), stamina(stam), profession(prof) {};
 	virtual ~Hero() {};
@@ -40,9 +43,13 @@ public:
 	int getHp() const { return hp; };
 	void setStam(int x) { stamina = x; };
 	int getStam() const { return stamina; };
+	sf::Sprite& getSprite() { return SHero; };
 
- 	void DrawCharacter(sf::Texture&, sf::Sprite&, Hero*, int heigh = 600, int width = 800);
-	void MoveCharacter(sf::Sprite&, int change_x, int change_y);
+ 	void DrawCharacter(int heigh = 600, int width = 800);
+	void setPosition(int pos_x, int pos_y) { SHero.setPosition(pos_x, pos_y); };
+
+
+	void MoveCharacter(int change_x, int change_y);
 	Hero* ChooseProfession(sf::RenderWindow&, sf::Event&, sf::Texture&, sf::Sprite&, sf::Texture&, sf::Sprite&, sf::Texture&, sf::Sprite&, sf::Texture&, sf::Sprite&, sf::Texture&, sf::Sprite&);
 	void getFromChest(vector<Items*>);
 	vector<Items*> openBackpack();

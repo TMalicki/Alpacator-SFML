@@ -11,7 +11,6 @@ void App::game(sf::RenderWindow& window, sf::Event& event)
 	srand(time(NULL));
 	window.setFramerateLimit(60);
 
-
 	/// map ///
 	Map::Map(global_y, global_x);
 	Map.Get_title(window, StartScreen);
@@ -40,21 +39,21 @@ void App::game(sf::RenderWindow& window, sf::Event& event)
 			getArrowKey(dir);
 
 			/// getting chests ///
-			for (int i = 0; i < SChest.size(); i++) {
-				if (SHero.getGlobalBounds().intersects(SChest[i].getGlobalBounds()))
+
+			for (list<Chests>::iterator itr = Chest.begin(); itr != Chest.end(); itr++)
+			{
+				if (collision(itr, Hero))
 				{
-					Hero->getFromChest(Chest[i].getItems());
-			
-					Chest.erase(Chest.begin() + i);
-					SChest.erase(SChest.begin() + i);
+					Hero->getFromChest(itr->getItems());
+					Chest.erase(itr);
 					break;
 				}
-			}	
+			}
 
 			/// moving character or highlighted square
 			if (inventory_open == false)
 				{
-					Hero->MoveCharacter(SHero, squarePixSize * dir[0], squarePixSize * dir[1]);	/// move character
+					Hero->MoveCharacter(squarePixSize * dir[0], squarePixSize * dir[1]);	/// move character
 				}
 			else if (inventory_open == true)
 				{
@@ -71,12 +70,11 @@ void App::game(sf::RenderWindow& window, sf::Event& event)
 				}
 
 			/// collision 
-			// collision(
-			for (int i = 0; i < SWall.size(); i++)
+			for (int i = 0; i < Map.getWallSprite().size(); i++)
 			{
-				if (SHero.getGlobalBounds().intersects(SWall[i].getGlobalBounds()))
+				if(collision(Map,i,Hero))
 				{
-					Hero->MoveCharacter(SHero, squarePixSize * (-dir[0]), squarePixSize * (-dir[1]));
+					Hero->MoveCharacter(squarePixSize * (-dir[0]), squarePixSize * (-dir[1]));
 				}
 			}
 			dir[0] = 0; dir[1] = 0;
@@ -99,13 +97,15 @@ void App::game(sf::RenderWindow& window, sf::Event& event)
 			if (gameOver == 0)
 			{
 				window.clear();
-				window.draw(SFloor);
-				for (int i = 0; i < SWall.size(); i++) window.draw(SWall[i]);
-				window.draw(SHero);
-				for (int i = 0; i < SChest.size(); i++)
+				window.draw(Map.getFloorSprite());
+				int wallSize = Map.getWallSprite().size();
+
+				for (int i = 0; i < wallSize; i++) window.draw(Map.getWallSprite()[i]);
+				window.draw(Hero->getSprite());
+
+				for (list<Chests>::iterator itr = Chest.begin(); itr != Chest.end(); itr++)
 				{
-					window.draw(SChest[i]);
-					cout << SChest[i].getPosition().x << " " << SChest[i].getPosition().y << endl;
+					window.draw(itr->getSprite());
 				}
 
 				if (inventory_open == true)
@@ -164,34 +164,39 @@ void App::startGame(sf::RenderWindow& window, sf::Event& event)
 				///hero maker and map drawer
 				Hero = Hero->ChooseProfession(window, event, TProf1, SProf1, TProf2, SProf2, TProf3, SProf3, TProf4, SProf4, TProf5, SProf5);
 
-				Map.Get_lvl1_map(TWall, SWall, TFloor, SFloor);
+				Map.Get_lvl1_map();
 
-				Hero->DrawCharacter(THero, SHero, Hero);
+				Hero->DrawCharacter();
 				Generate_Hero();
 
-				set_chestAmount(25);
-				sf::Sprite temp;
+				chestAmount = 25;
+
 				Chests tempCh;
 				for (int i = 0; i < chestAmount; i++)
 				{
-					SChest.push_back(temp);
 					Chest.push_back(tempCh);
-					Chest[i].DrawChests(TChest, SChest[i]);
 				}
+	
+				for (list<Chests>::iterator itr = Chest.begin(); itr != Chest.end(); itr++)
+				{
+					itr->DrawChests();
+				}
+
 				Generate_Chests();
 				gameOver = 0;
 			}
 		}
 	}
 	window.clear();
-	window.draw(SFloor);
-	for (int i = 0; i < SWall.size(); i++) window.draw(SWall[i]);
-	window.draw(SHero);
-	for (int i = 0; i < Chest.size(); i++)
+	window.draw(Map.getFloorSprite());
+	for (int i = 0; i < Map.getWallSprite().size(); i++) window.draw(Map.getWallSprite()[i]);
+	window.draw(Hero->getSprite());
+
+	for (list<Chests>::iterator itr = Chest.begin(); itr != Chest.end(); itr++)
 	{
-		window.draw(SChest[i]);
-		cout << SChest[i].getPosition().x << " " << SChest[i].getPosition().y << endl;
+		window.draw(itr->getSprite());
 	}
+
 	window.display();
 }
 
@@ -223,6 +228,30 @@ void App::getArrowKey(int* dir)
 	}
 }
 
+bool App::collision(::Map& Map, int counter, ::Hero* Hero)
+{
+	if (Hero->getSprite().getGlobalBounds().intersects(Map.getWallSprite()[counter].getGlobalBounds())) return true;
+	else return false;
+}
+
+bool App::collision(::list<Chests>::iterator& Chest, ::Hero* Hero)
+{
+	if(Hero->getSprite().getGlobalBounds().intersects(Chest->getSprite().getGlobalBounds())) return true;
+	else return false;
+}
+
+bool App::collision(::Map& Map, int mapPos, list<Chests>::iterator& Chest)
+{
+	if (Chest->getSprite().getGlobalBounds().intersects(Map.getWallSprite()[mapPos].getGlobalBounds())) return true;
+	else return false;
+}
+
+bool App::collision(list<Chests>::iterator& Chest, list<Chests>::iterator& prevChest)
+{
+	if (Chest->getSprite().getGlobalBounds().intersects(prevChest->getSprite().getGlobalBounds())) return true;
+	else return false;
+}
+
 void App::Generate_Hero()
 {
 	//vector<string> current_map = map.get_map();
@@ -236,11 +265,11 @@ void App::Generate_Hero()
 	temp_y = rand() % ((global_y / squarePixSize) - 1) + 1;
 	temp_y *= squarePixSize;
 
-	SHero.setPosition(temp_x, temp_y);
+	Hero->setPosition(temp_x, temp_y);
 
 	do
 	{
-		if ((SHero.getGlobalBounds().intersects(SWall[counter].getGlobalBounds())))
+		if (collision(Map, counter, Hero))
 		{
 			counter = 0;
 			temp_x = rand() % ((global_x / squarePixSize) - 1) + 1;
@@ -249,14 +278,14 @@ void App::Generate_Hero()
 			temp_y = rand() % ((global_y / squarePixSize) - 1) + 1;
 			temp_y *= squarePixSize;
 
-			SHero.setPosition(temp_x, temp_y);
+			Hero->setPosition(temp_x, temp_y);
 		}
 		else
 		{
 			counter++;
 		}
 	//	cout << Character.getPosition().x << " " << Character.getPosition().y << endl;
-	} while (counter < SWall.size());
+	} while (counter < Map.getWallSprite().size());
 }
 
 void App::open_inventory()
@@ -297,18 +326,19 @@ void App::Generate_Chests()
 	//vector<Items*>* chestItems = new vector <Items*>[itemAmount];
 	int itemTypeChoose;
 	//int itemNameChoose;
-
-	for (int i = 0; i < chestAmount; i++)
+	
+	for (list<Chests>::iterator itr = Chest.begin(); itr != Chest.end(); itr++)
 	{
 		int temp_x = 0;
 		int temp_y = 0;
-		bool collision = 0;
+		bool collided = 0;
 
 		temp_x = rand() % ((global_x / squarePixSize) - 1) + 1;
 		temp_x *= squarePixSize;
 		temp_y = rand() % ((global_y / squarePixSize) - 1) + 1;
 		temp_y *= squarePixSize;
-		SChest[i].setPosition(temp_x, temp_y);
+
+		itr->setPosition(temp_x, temp_y);
 
 		///  INPUT RANDOMLY GENERATED ITEMS INTO CHESTS /////////////////////
 		set_itemAmount(rand() % 5 + 1);
@@ -318,35 +348,37 @@ void App::Generate_Chests()
 		{
 			itemTypeChoose = rand() % 300 + 1; //from 1 to 3
 
-			if (itemTypeChoose < 100) Chest[i].setItems(atkItems[rand() % atkNumItems]); //from 0 to 3 (get_atkNumItems()-1)
-			else if (itemTypeChoose >= 100 && itemTypeChoose < 200) Chest[i].setItems(defItems[rand() % defNumItems]);
-			else if (itemTypeChoose >= 200) Chest[i].setItems(potItems[rand() % potNumItems]);
+			if (itemTypeChoose < 100) itr->setItems(atkItems[rand() % atkNumItems]); //from 0 to 3 (get_atkNumItems()-1)
+			else if (itemTypeChoose >= 100 && itemTypeChoose < 200) itr->setItems(defItems[rand() % defNumItems]);
+			else if (itemTypeChoose >= 200) itr->setItems(potItems[rand() % potNumItems]);
 		}
 		///
 
 		do
 		{
-			collision = 0;
-			for (int j = 0; j < SWall.size(); j++)
+			collided = 0;
+			for (int j = 0; j < Map.getWallSprite().size(); j++)
 			{
-				if ((SChest[i].getGlobalBounds().intersects(SWall[j].getGlobalBounds())) && collision == 0)
+				if(collision(Map, j, itr) && collided == 0)
 				{
-					collision = 1;
+					collided = 1;
 				}
 			}
-			if ((SChest[i].getGlobalBounds().intersects(SHero.getGlobalBounds())) && collision == 0)
+			if(collision(itr,Hero) && collided == 0)
 			{
-				collision = 1;
+				collided = 1;
 			}
-			for (int j = 0; j < i && collision == 0; j++)
+
+			for (list<Chests>::iterator Previtr = Chest.begin(); Previtr != itr && collided == 0; Previtr++)
 			{
-				if ((SChest[i].getGlobalBounds().intersects(SChest[j].getGlobalBounds())))
+				if (collision(itr, Previtr))
 				{
-					collision = 1;
+					collided = 1;
 				}
 			}
-				
-			if(collision == 1)
+
+							
+			if(collided == 1)
 			{
 				temp_x = rand() % ((global_x / squarePixSize) - 1) + 1;
 				temp_x *= squarePixSize;
@@ -354,9 +386,9 @@ void App::Generate_Chests()
 				temp_y = rand() % ((global_y / squarePixSize) - 1) + 1;
 				temp_y *= squarePixSize;
 
-				SChest[i].setPosition(temp_x, temp_y);
+				itr->setPosition(temp_x, temp_y);
 			}
-		} while (collision);
+		} while (collided);
 	}
 }
 

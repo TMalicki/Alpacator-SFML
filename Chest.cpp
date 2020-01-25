@@ -1,7 +1,7 @@
 #include "Chest.h"
 
-void Chests::DrawChests(sf::Texture& texture, sf::Sprite& sprite)
+void Chests::DrawChests()
 {
-	texture.loadFromFile("images/chest.png");
-	sprite.setTexture(texture);
+	TChests.loadFromFile("images/chest.png");
+	SChests.setTexture(TChests);
 }

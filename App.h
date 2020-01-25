@@ -15,6 +15,7 @@
 #include "HealingPot.h"
 #include "StaminaPot.h"
 #include "Chest.h"
+#include <list>
 
 using namespace std;
 
@@ -31,26 +32,26 @@ private:
 	/// class objects in App class
 	Map Map;					// class App has class Map
 	Hero* Hero;					// class App has class Hero
-	vector<Chests> Chest;		// class App has container of chests
-						
+	list<Chests> Chest;		// class App has container of chests
+
 	/// SPRITES ///////////
 	// startScreen sprite
 	sf::Sprite StartScreen;
 	// Wall sprite
-	sf::Texture TWall;
-	vector<sf::Sprite> SWall;
+	///sf::Texture TWall;			///
+	///vector<sf::Sprite> SWall;	///
 	// Floor sprite
-	sf::Texture TFloor;
-	sf::Sprite SFloor;
+	///sf::Texture TFloor;	///
+	///sf::Sprite SFloor;	///
 	// Hero sprite
-	sf::Texture THero;
-	sf::Sprite SHero;
+	///sf::Texture THero;	///
+	///sf::Sprite SHero;	///
 	// profession of hero sprites
 	sf::Texture TProf1, TProf2, TProf3, TProf4, TProf5;
 	sf::Sprite SProf1, SProf2, SProf3, SProf4, SProf5;
 	// Chest sprites
-	sf::Texture TChest;
-	vector<sf::Sprite> SChest;
+	//sf::Texture TChest;
+	//vector<sf::Sprite> SChest;
 	// backpack (not items) sprite
 	sf::Texture TInventory;
 	sf::Sprite SInventory;
@@ -101,6 +102,11 @@ public:
 	// HERO /////////////////////////////////////////////////////////////////////////////////
 	//void Hero_Maker();
 	//void Move();
+	bool collision(::Map&, int, ::Hero*);
+	bool collision(::list<Chests>::iterator&, ::Hero*);
+	bool collision(::Map&, int, ::list<Chests>::iterator&);
+	bool collision(::list<Chests>::iterator&, ::list<Chests>::iterator&);
+
 	void Generate_Hero();
 	void open_inventory();
 	void quit_inventory();

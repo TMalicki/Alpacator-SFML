@@ -15,8 +15,11 @@ private:
 	int WIDTH;
 	int wallSize;	// 50 px
 
-	// map container
-	//vector<sf::Sprite> map;
+	sf::Texture TWall;
+	vector<sf::Sprite> SWall;
+	sf::Texture TFloor;
+	sf::Sprite SFloor;
+
 public:
 	// set map dimension
 	Map(int H = 600, int W = 800, int wSize = 50);
@@ -28,8 +31,9 @@ public:
 	int get_wallSize() { return wallSize; };
 
 	void Get_title(sf::RenderWindow&, sf::Sprite&);
-	void Get_lvl1_map(sf::Texture&, vector<sf::Sprite>&, sf::Texture&, sf::Sprite&);				// put map1 into "map" container
-
+	void Get_lvl1_map();				// put map1 into "map" container
+	sf::Sprite& getFloorSprite() { return SFloor; };
+	vector<sf::Sprite>& getWallSprite() { return SWall; };
 	// display map container
 //	void map_disp(vector<sf::Sprite>);
 	// method to get map container

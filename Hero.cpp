@@ -5,23 +5,23 @@
 #include "Assassin.h"
 #include "Mage.h"
 
-void Hero::DrawCharacter(sf::Texture& image, sf::Sprite& Char, Hero* hero, int heigh, int width)
+void Hero::DrawCharacter(int heigh, int width)
 {
-	if (hero != nullptr)
+	if (this != nullptr)
 	{
-		string prof = hero->getProfession();
-		if (prof == "Barbarian") image.loadFromFile("images/characters/alpacaBarbarian.png");
-		else if (prof == "Knight") image.loadFromFile("images/characters/alpacaKnight.png");
-		else if (prof == "Monk") image.loadFromFile("images/characters/alpacaMonk.png");
-		else if (prof == "Assassin") image.loadFromFile("images/characters/alpacaAssassin.png");
-		else if (prof == "Mage") image.loadFromFile("images/characters/alpacaMage.png");
+		string prof = this->getProfession();
+		if (prof == "Barbarian") THero.loadFromFile("images/characters/alpacaBarbarian.png");
+		else if (prof == "Knight") THero.loadFromFile("images/characters/alpacaKnight.png");
+		else if (prof == "Monk") THero.loadFromFile("images/characters/alpacaMonk.png");
+		else if (prof == "Assassin") THero.loadFromFile("images/characters/alpacaAssassin.png");
+		else if (prof == "Mage") THero.loadFromFile("images/characters/alpacaMage.png");
 	}
-	Char.setTexture(image);
+	SHero.setTexture(THero);
 }
 
-void Hero::MoveCharacter(sf::Sprite& Char, int change_x, int change_y)
+void Hero::MoveCharacter(int change_x, int change_y)
 {
-	Char.move(change_x, change_y);
+	SHero.move(change_x, change_y);	
 }
 
 Hero* Hero::ChooseProfession(sf::RenderWindow& window, sf::Event& event, sf::Texture& tKnight, sf::Sprite& SKnight, sf::Texture& tBarbarian, sf::Sprite& SBarbarian, sf::Texture& tMage, sf::Sprite& SMage, 
