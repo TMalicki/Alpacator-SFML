@@ -21,8 +21,15 @@ Alpacator is a game in which you have to kill monsters, getting stronger, and fi
 - fight mechanic
 - getting exp
 - different lvls
+- some windows in game are still empty
 
 **Control**
 - arrow keys - moving
 - i button - open/close inventory
 - enter (in inventory) - equip/unequip selected item 
+
+  <p float="left">
+  <img src="images/alpacator1.jpg" alt="Image"/></div>
+  <img src="images/alpacator2.jpg" alt="Image"/> </div>
+  <img src="images/alpacator3.jpg" alt="Image"/></div>
+  </p>
