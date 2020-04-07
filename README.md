@@ -29,7 +29,7 @@ Alpacator is a game in which you have to kill monsters, getting stronger, and fi
 - enter (in inventory) - equip/unequip selected item 
 
   <p float="left">
-  <img src="alpacator1.jpg" alt="Image"/></div>
-  <img src="alpacator2.jpg" alt="Image"/> </div>
-  <img src="alpacator3.jpg" alt="Image"/></div>
+  <img src="alpacator1.jpg" alt="Image" width="250"/></div>
+  <img src="alpacator2.jpg" alt="Image" width="250"/> </div>
+  <img src="alpacator3.jpg" alt="Image" width="250"/></div>
   </p>
