@@ -3,7 +3,6 @@
 #include <vector>
 #include <Windows.h>
 #include <conio.h>
-#include "Knight.h"
 
 void App::game(sf::RenderWindow& window, sf::Event& event)
 {
@@ -12,20 +11,20 @@ void App::game(sf::RenderWindow& window, sf::Event& event)
 	window.setFramerateLimit(60);
 
 	/// map ///
-	Map::Map(global_y, global_x);
-	Map.Get_title(window, StartScreen);
+	Map::Map(globalHeight, globalWidth);
+	Map.Get_title(window, startScreenSprite);
 
 	/// local variables for moving ///
+
 	int dir[2] {0,0};
 
 	/// load items into memory ///
-	setArmorItems();
-	setWeaponItems();
-	setPotionItems();
+	loadToGame.loadItems();
 	
 	HeroStatBar();
 
 	/// start game window ///
+
 	startGame(window, event);
 
 	/// main loop ///
@@ -37,14 +36,14 @@ void App::game(sf::RenderWindow& window, sf::Event& event)
 			{
 				window.close();
 			}
-
+			
 			/// moving - it should be inside hero class?
 			getArrowKey(dir);
-
+			
 			/// getting chests ///
 			for (auto itr = Chest.begin(); itr != Chest.end(); itr++)
 			{
-				if (collision(itr, Hero))
+				if (collision.isCollided(itr, Hero))
 				{
 					Hero->getFromChest(itr->getItems());
 					Chest.erase(itr);
@@ -55,7 +54,7 @@ void App::game(sf::RenderWindow& window, sf::Event& event)
 			/// fighting monsters ///
 			for (auto itr = Monster.begin(); itr != Monster.end(); itr++)
 			{
-				if (collision(itr, Hero))
+				if (collision.isCollided(itr, Hero))
 				{
 					//fighting();
 					fighting(window, *itr);
@@ -67,32 +66,32 @@ void App::game(sf::RenderWindow& window, sf::Event& event)
 			/// moving character or highlighted square
 			if (inventory_open == false)
 				{
-					Hero->MoveCharacter(squarePixSize * dir[0], squarePixSize * dir[1]);	/// move character
+					Hero->MoveCharacter(boardSquareSize * dir[0], boardSquareSize * dir[1]);	/// move character
 				}
 			else if (inventory_open == true)
 				{
 					int counter = 0;
 					vector<Items*> Backpack = Hero->openBackpack();
 
-					ShighlightItem.move(dir[0] * 53, dir[1] * 53);	/// move highlighted square
+					highlightForActiveItemSquare.move(dir[0] * 53, dir[1] * 53);	/// move highlighted square
 
 					for(int i = 0; i<Backpack.size(); i++)
 					{
 						//if (collision(Backpack[i], ShighlightItem));
-						if (Backpack[i]->getItemsSprite().getGlobalBounds().intersects(ShighlightItem.getGlobalBounds()))
+						if (Backpack[i]->getItemsSprite().getGlobalBounds().intersects(highlightForActiveItemSquare.getGlobalBounds()))
 						{
 							counter++;
 						}
 					}
-					if(counter == 0) ShighlightItem.move(-dir[0] * 53, -dir[1] * 53);
+					if(counter == 0) highlightForActiveItemSquare.move(-dir[0] * 53, -dir[1] * 53);
 				}
 
 			/// collision 
 			for (int i = 0; i < Map.getWallSprite().size(); i++)
 			{
-				if(collision(Map,i,Hero))
+				if(collision.isCollided(Map,i,Hero))
 				{
-					Hero->MoveCharacter(squarePixSize * (-dir[0]), squarePixSize * (-dir[1]));
+					Hero->MoveCharacter(boardSquareSize * (-dir[0]), boardSquareSize * (-dir[1]));
 				}
 			}
 			dir[0] = 0; dir[1] = 0;
@@ -102,7 +101,7 @@ void App::game(sf::RenderWindow& window, sf::Event& event)
 			{
 				while (sf::Keyboard::isKeyPressed(sf::Keyboard::I)) {}
 
-				ShighlightItem.setPosition(xPosItem, yPosItem);
+				highlightForActiveItemSquare.setPosition(xPosItem, yPosItem);
 				open_inventory();
 			}
 			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::I) && inventory_open == true)
@@ -118,7 +117,7 @@ void App::game(sf::RenderWindow& window, sf::Event& event)
 
 				for (int i = 0; i < Backpack.size(); i++)
 				{
-					if (collision(Backpack[i], ShighlightItem))
+					if (collision.isCollided(Backpack[i], highlightForActiveItemSquare))
 					{
 						if (Backpack[i]->getEquip() == false)
 						{
@@ -158,7 +157,7 @@ void App::game(sf::RenderWindow& window, sf::Event& event)
 							if (flag == false)
 							{
 								Backpack[i]->setEquip(true);
-								EquippedItem.setPosition(ShighlightItem.getPosition());
+								highlightForEquippedItemSquare.setPosition(highlightForActiveItemSquare.getPosition());
 								
 								changeHeroStat(Backpack[i],'+');
 								//Backpack[i]->getAtk();
@@ -196,7 +195,8 @@ void App::startGame(sf::RenderWindow& window, sf::Event& event)
 				///generate items
 				//
 				///hero maker and map drawer
-				Hero = Hero->ChooseProfession(window, event, TProf1, SProf1, TProf2, SProf2, TProf3, SProf3, TProf4, SProf4, TProf5, SProf5);
+				Hero = Hero->ChooseProfession(window, event, profession1Texture, profession1Sprite, profession2Texture, profession2Sprite,
+						profession3Texture, profession3Sprite, profession4Texture, profession4Sprite, profession5Texture, profession5Sprite);
 
 				Map.Get_lvl1_map();
 
@@ -242,7 +242,7 @@ void App::startGame(sf::RenderWindow& window, sf::Event& event)
 		window.draw((*itr)->getSprite());
 	}
 
-	window.draw(SHeroBarStats);
+	window.draw(heroBarStatsSprite);
 	printStats(window);
 
 	window.display();
@@ -299,7 +299,7 @@ void App::drawEverything(sf::RenderWindow& window)
 		window.draw((*itr)->getSprite());
 	}
 
-	window.draw(SHeroBarStats);
+	window.draw(heroBarStatsSprite);
 	printStats(window);
 
 	if (inventory_open == true)
@@ -307,8 +307,8 @@ void App::drawEverything(sf::RenderWindow& window)
 		int x = xPosItem; int y = yPosItem - 53;// because it is increase in line 160
 		int count = 0;
 
-		window.draw(SInventory);
-		window.draw(ShighlightItem);
+		window.draw(inventorySprite);
+		window.draw(highlightForActiveItemSquare);
 
 		///
 		vector<Items*> Backpack = Hero->openBackpack();
@@ -317,7 +317,7 @@ void App::drawEverything(sf::RenderWindow& window)
 		for (int i = 0; i < Backpack.size(); i++)
 		{
 			//if (SHeroItems[i].getGlobalBounds().intersects(ShighlightItem.getGlobalBounds()))
-			if (Backpack[i]->getItemsSprite().getGlobalBounds().intersects(ShighlightItem.getGlobalBounds()))
+			if (Backpack[i]->getItemsSprite().getGlobalBounds().intersects(highlightForActiveItemSquare.getGlobalBounds()))
 			{
 				counter = i;
 			}
@@ -334,16 +334,16 @@ void App::drawEverything(sf::RenderWindow& window)
 				if (BackpackType == "Dagger" || BackpackType == "Axe")
 				{
 					Backpack[i]->setItemSpritePos(463, 210);
-					EquippedItem.setPosition(EquippedItemPos);
+					highlightForEquippedItemSquare.setPosition(EquippedItemPos);
 				}
 				else if (BackpackType == "Breast Plate" || BackpackType == "Pants")
 				{
 					Backpack[i]->setItemSpritePos(516, 210);
-					EquippedItem.setPosition(EquippedItemPos);
+					highlightForEquippedItemSquare.setPosition(EquippedItemPos);
 				}
 
 				window.draw(Backpack[i]->getItemsSprite());
-				window.draw(EquippedItem);
+				window.draw(highlightForEquippedItemSquare);
 			}
 		}
 
@@ -364,60 +364,6 @@ void App::drawEverything(sf::RenderWindow& window)
 	}
 }
 
-bool App::collision(::Map& Map, int counter, ::Hero* Hero)
-{
-	if (Hero->getSprite().getGlobalBounds().intersects(Map.getWallSprite()[counter].getGlobalBounds())) return true;
-	else return false;
-}
-
-bool App::collision(::list<Chests>::iterator& Chest, ::Hero* Hero)
-{
-	if(Hero->getSprite().getGlobalBounds().intersects(Chest->getSprite().getGlobalBounds())) return true;
-	else return false;
-}
-
-bool App::collision(::Map& Map, int mapPos, list<Chests>::iterator& Chest)
-{
-	if (Chest->getSprite().getGlobalBounds().intersects(Map.getWallSprite()[mapPos].getGlobalBounds())) return true;
-	else return false;
-}
-
-bool App::collision(list<Chests>::iterator& Chest, list<Chests>::iterator& prevChest)
-{
-	if (Chest->getSprite().getGlobalBounds().intersects(prevChest->getSprite().getGlobalBounds())) return true;
-	else return false;
-}
-
-bool App::collision(::Items* Item, ::sf::RectangleShape& Sprite)
-{
-	if (Item->getItemsSprite().getGlobalBounds().intersects(Sprite.getGlobalBounds())) return true;
-	return false;
-}
-
-bool App::collision(::Map& Map, int counter, ::list<Monsters*>::iterator& Monster)
-{
-	if ((*Monster)->getSprite().getGlobalBounds().intersects(Map.getWallSprite()[counter].getGlobalBounds())) return true;
-	else return false;
-}
-
-bool App::collision(::list<Monsters*>::iterator& Monster, ::Hero* hero)
-{
-	if (Hero->getSprite().getGlobalBounds().intersects((*Monster)->getSprite().getGlobalBounds())) return true;
-	else return false;
-}
-
-bool App::collision(::list<Chests>::iterator& Chest, ::list<Monsters*>::iterator& Monster)
-{
-	if (Chest->getSprite().getGlobalBounds().intersects((*Monster)->getSprite().getGlobalBounds())) return true;
-	else return false;
-}
-
-bool App::collision(::list<Monsters*>::iterator& Monster, ::list<Monsters*>::iterator& prevMonster)
-{
-	if ((*Monster)->getSprite().getGlobalBounds().intersects((*prevMonster)->getSprite().getGlobalBounds())) return true;
-	else return false;
-}
-
 void App::Generate_Hero()
 {
 	//vector<string> current_map = map.get_map();
@@ -425,24 +371,24 @@ void App::Generate_Hero()
 	int temp_y = 0;
 	int counter = 0;
 
-	temp_x = rand() % ((global_x / squarePixSize) - 1) + 1;
-	temp_x *= squarePixSize;
+	temp_x = rand() % ((globalWidth / boardSquareSize) - 1) + 1;
+	temp_x *= boardSquareSize;
 
-	temp_y = rand() % ((global_y / squarePixSize) - 1) + 1;
-	temp_y *= squarePixSize;
+	temp_y = rand() % ((globalHeight / boardSquareSize) - 1) + 1;
+	temp_y *= boardSquareSize;
 
 	Hero->setPosition(temp_x, temp_y);
 
 	do
 	{
-		if (collision(Map, counter, Hero))
+		if (collision.isCollided(Map, counter, Hero))
 		{
 			counter = 0;
-			temp_x = rand() % ((global_x / squarePixSize) - 1) + 1;
-			temp_x *= squarePixSize;
+			temp_x = rand() % ((globalWidth / boardSquareSize) - 1) + 1;
+			temp_x *= boardSquareSize;
 
-			temp_y = rand() % ((global_y / squarePixSize) - 1) + 1;
-			temp_y *= squarePixSize;
+			temp_y = rand() % ((globalHeight / boardSquareSize) - 1) + 1;
+			temp_y *= boardSquareSize;
 
 			Hero->setPosition(temp_x, temp_y);
 		}
@@ -456,8 +402,8 @@ void App::Generate_Hero()
 
 void App::open_inventory()
 {
-		TInventory.loadFromFile("images/inventory.png");
-		SInventory.setTexture(TInventory);
+		inventoryTexture.loadFromFile("images/inventory.png");
+		inventorySprite.setTexture(inventoryTexture);
 		inventory_open = true;
 
 		vector<Items*> YourItems = Hero->openBackpack();
@@ -475,32 +421,31 @@ void App::quit_inventory()
 
 void App::printStats(sf::RenderWindow& window)
 {
-	font.loadFromFile("fonts/QuiteMagical.ttf");
-	StatInfo.setFont(font);
-	StatInfo.setCharacterSize(30);
+	textFont.loadFromFile("fonts/QuiteMagical.ttf");
+	statisticsInfoText.setFont(textFont);
+	statisticsInfoText.setCharacterSize(30);
 
 	//StatInfo.setString(Hero->getProfession());
-	StatInfo.setString(to_string(Hero->getHp()) + " / " + to_string(Hero->getHp()));
-	StatInfo.setOrigin(0, 15);
-	StatInfo.setPosition(100, 628);
-	window.draw(StatInfo);
+	statisticsInfoText.setString(to_string(Hero->getHp()) + " / " + to_string(Hero->getHp()));
+	statisticsInfoText.setOrigin(0, 15);
+	statisticsInfoText.setPosition(100, 628);
+	window.draw(statisticsInfoText);
 
-	StatInfo.setString(to_string(Hero->getStrength()));
-	StatInfo.setPosition(100, 664);
-	window.draw(StatInfo);
+	statisticsInfoText.setString(to_string(Hero->getStrength()));
+	statisticsInfoText.setPosition(100, 664);
+	window.draw(statisticsInfoText);
 
-	StatInfo.setString(to_string(Hero->getAgillity()));
-	StatInfo.setPosition(360, 628);
-	window.draw(StatInfo);
+	statisticsInfoText.setString(to_string(Hero->getAgillity()));
+	statisticsInfoText.setPosition(360, 628);
+	window.draw(statisticsInfoText);
 
-	StatInfo.setString(to_string(Hero->getDefence()));
-	StatInfo.setPosition(360, 664);
-	window.draw(StatInfo);
+	statisticsInfoText.setString(to_string(Hero->getDefence()));
+	statisticsInfoText.setPosition(360, 664);
+	window.draw(statisticsInfoText);
 
-	StatInfo.setString(to_string(Hero->getStam()));
-	StatInfo.setPosition(620, 628);
-	window.draw(StatInfo);
-	//agil def stam
+	statisticsInfoText.setString(to_string(Hero->getStam()));
+	statisticsInfoText.setPosition(620, 628);
+	window.draw(statisticsInfoText);
 }
 
 void App::changeHeroStat(Items* item, char sign)
@@ -631,7 +576,7 @@ void App::fighting(sf::RenderWindow& window, Monsters* Monster)
 		window.draw(rectWhite);
 		window.draw(rectangle);
 		window.draw(actionScreen);
-		window.draw(SHeroBarStats);
+		window.draw(heroBarStatsSprite);
 		window.draw(SHero);
 		window.draw(SMonster);
 
@@ -641,142 +586,77 @@ void App::fighting(sf::RenderWindow& window, Monsters* Monster)
 
 void App::Generate_Chests()
 {
-	int itemTypeChoose;
-	
 	for (list<Chests>::iterator itr = Chest.begin(); itr != Chest.end(); itr++)
 	{
 		int temp_x = 0;
 		int temp_y = 0;
-		bool collided = 0;
-
-		temp_x = rand() % ((global_x / squarePixSize) - 1) + 1;
-		temp_x *= squarePixSize;
-		temp_y = rand() % ((global_y / squarePixSize) - 1) + 1;
-		temp_y *= squarePixSize;
+	
+		temp_x = rand() % ((globalWidth / boardSquareSize) - 1) + 1;
+		temp_x *= boardSquareSize;
+		temp_y = rand() % ((globalHeight / boardSquareSize) - 1) + 1;
+		temp_y *= boardSquareSize;
 
 		itr->setPosition(temp_x, temp_y);
 
 		///  INPUT RANDOMLY GENERATED ITEMS INTO CHESTS /////////////////////
-		set_itemAmount(rand() % 5 + 1);
-		//set_itemAmount(10);
+		loadToGame.setItemAmount(rand() % 5 + 1);
+		itr->setItems(loadToGame.generateItemsInChests());
 
-		for (int j = 0; j < itemAmount; j++)
-		{
-			itemTypeChoose = rand() % 300 + 1; //from 1 to 3
-
-			if (itemTypeChoose < 100)
-			{
-				int random = rand() % atkNumItems;
-
-				Items* temp = atkItems[random]->copyItems();
-				itr->setItems(temp);
-			}
-			else if (itemTypeChoose >= 100 && itemTypeChoose < 200)
-			{
-				int random = rand() % defNumItems;
-
-				Items* temp = defItems[random]->copyItems();
-				itr->setItems(temp);
-			}
-			else if (itemTypeChoose >= 200)
-			{
-				int random = rand() % potNumItems;
-
-				Items* temp = potItems[random]->copyItems();
-				itr->setItems(temp);
-			}
-		}
-		///
 		do
 		{
-			collided = 0;
+			collision.resetCollision();
 			for (int j = 0; j < Map.getWallSprite().size(); j++)
 			{
-				if(collision(Map, j, itr) && collided == 0)
-				{
-					collided = 1;
-				}
+				if (collision.isCollided(Map, j, itr)) collision.collisionSet();
 			}
-			if(collision(itr,Hero) && collided == 0)
-			{
-				collided = 1;
-			}
+			collision.isCollided(itr, Hero);
 
-			for (list<Chests>::iterator Previtr = Chest.begin(); Previtr != itr && collided == 0; Previtr++)
+			for (list<Chests>::iterator Previtr = Chest.begin(); Previtr != itr && collision.checkIfAlreadyCollided() == false; Previtr++)
 			{
-				if (collision(itr, Previtr))
-				{
-					collided = 1;
-				}
+				if(collision.isCollided(itr, Previtr)) collision.collisionSet();
 			}
 						
-			if(collided == 1)
+			if(collision.checkIfAlreadyCollided())
 			{
-				temp_x = rand() % ((global_x / squarePixSize) - 1) + 1;
-				temp_x *= squarePixSize;
+				temp_x = rand() % ((globalWidth / boardSquareSize) - 1) + 1;
+				temp_x *= boardSquareSize;
 
-				temp_y = rand() % ((global_y / squarePixSize) - 1) + 1;
-				temp_y *= squarePixSize;
+				temp_y = rand() % ((globalHeight / boardSquareSize) - 1) + 1;
+				temp_y *= boardSquareSize;
 
 				itr->setPosition(temp_x, temp_y);
 			}
-		} while (collided);
+		} while (collision.checkIfAlreadyCollided());
 	}
 }
 
 void App::HeroStatBar()
 {
-	THeroBarStats.loadFromFile("images/backgroundStats.png");
-	SHeroBarStats.setTexture(THeroBarStats);
-	SHeroBarStats.setPosition(0, 600);
+	heroBarStatsTexture.loadFromFile("images/backgroundStats.png");
+	heroBarStatsSprite.setTexture(heroBarStatsTexture);
+	heroBarStatsSprite.setPosition(0, 600);
 }
 
-void App::setWeaponItems()
-{
-	///atk/def/agility/stamina/hp/durability
-	//atkItems.push_back(new Dagger("Carrot", 5, 1, 3, 1, 0, 5));
-	atkItems.push_back(new Dagger("Carrot Sword", 6, 3, 2, 0, 0, 5));
-	//atkItems.push_back(new Dagger("Broken Leg", 7, 2, 2, 0, 4));
-	atkItems.push_back(new Axe("Mjolnir", 13, 1, 5, 0, 2));
-	atkNumItems = atkItems.size();
-}
 
-void App::setArmorItems()
-{
-	///atk/def/agility/stamina/hp/durability
-	defItems.push_back(new BreastPlate("Chain Armor", 1, 8, 2, 50, 6));
-	defItems.push_back(new Pants("Monk Robe", 0, 5, 5, 16, 8));
-	defNumItems = defItems.size();
-}
-
-void App::setPotionItems()
-{
-	///atk/def/agility/stamina/hp
-	potItems.push_back(new HealingPot("Health Potion", 0, 0, 0, 100));
-	potItems.push_back(new StaminaPot("Mana Potion", 0, 0, 2, 0));
-	potNumItems = potItems.size();
-}
 
 void App::Generate_Monsters(int lvl)
 {
 	int monsterTypeChoose;
-	Troll* tempMon = new Troll(1, 10);
 
 	for (int i = 0; i < monsterAmount; i++)
 	{
-		Monster.push_back(tempMon);
+		Monster.push_back(new Troll(1,10));
 	}
 
-	for (list<Monsters*>::iterator itr = Monster.begin(); itr != Monster.end(); itr++)
+	for (auto itr = Monster.begin(); itr != Monster.end(); itr++)
 	{
 		int temp_x = 0;
 		int temp_y = 0;
-		bool collided = 0;
 
-		temp_x = rand() % ((global_x / squarePixSize) - 1) + 1;
-		temp_x *= squarePixSize;
-		temp_y = rand() % ((global_y / squarePixSize) - 1) + 1;
-		temp_y *= squarePixSize;
+		temp_x = rand() % ((globalWidth / boardSquareSize) - 1) + 1;
+		temp_x *= boardSquareSize;
+		temp_y = rand() % ((globalHeight / boardSquareSize) - 1) + 1;
+		temp_y *= boardSquareSize;
 
 		(*itr)->setPosition(temp_x, temp_y);
 		
@@ -792,59 +672,42 @@ void App::Generate_Monsters(int lvl)
 		{
 			*itr = (new Ball(lvl, 10));
 		}
-		//else if (monsterTypeChoose >= 200)
-		//{
-		//	*itr = (new Troll(lvl, 10));
-		//}
 
 		for (list<Monsters*>::iterator itr2 = Monster.begin(); itr2 != Monster.end(); itr2++)
 		{
 			(*itr2)->getLook();
 		}
-		///
+
 		do
 		{
-			collided = 0;
+			collision.resetCollision();
 			for (int j = 0; j < Map.getWallSprite().size(); j++)
 			{
-				if (collision(Map, j, itr) && collided == 0)
-				{
-					collided = 1;
-				}
+				if(collision.isCollided(Map, j, itr)) collision.collisionSet();
 			}
-			if (collision(itr, Hero) && collided == 0)
-			{
-				collided = 1;
-			}
+			if(collision.isCollided(itr, Hero)) collision.collisionSet();
 
-			for (list<Monsters*>::iterator Previtr = Monster.begin(); Previtr != itr && collided == 0; Previtr++)
+			for (list<Monsters*>::iterator Previtr = Monster.begin(); Previtr != itr && collision.checkIfAlreadyCollided() == false; Previtr++)
 			{
-				if (collision(itr, Previtr))
-				{
-					collided = 1;
-				}
+				if(collision.isCollided(itr, Previtr)) collision.collisionSet();
 			}
 
 			for (list<Chests>::iterator chestItr = Chest.begin(); chestItr != Chest.end(); chestItr++)
 			{
-				if (collision(chestItr, itr))
-				{
-					collided = 1;
-				}
+				if(collision.isCollided(chestItr, itr)) collision.collisionSet();
 			}
 	
-
-			if (collided == 1)
+			if (collision.checkIfAlreadyCollided())
 			{
-				temp_x = rand() % ((global_x / squarePixSize) - 1) + 1;
-				temp_x *= squarePixSize;
+				temp_x = rand() % ((globalWidth / boardSquareSize) - 1) + 1;
+				temp_x *= boardSquareSize;
 
-				temp_y = rand() % ((global_y / squarePixSize) - 1) + 1;
-				temp_y *= squarePixSize;
+				temp_y = rand() % ((globalHeight / boardSquareSize) - 1) + 1;
+				temp_y *= boardSquareSize;
 
 				(*itr)->setPosition(temp_x, temp_y);
 			}
-		} while (collided);
+		} while (collision.checkIfAlreadyCollided());
 	}
 }
 

@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <vector>
 #include "Items.h"
@@ -23,6 +25,7 @@ public:
 	//vector<int> getCoord() const { return chestCoord; };
 
 	void setItems(Items* item) { items.push_back(item); };
+	void setItems(std::vector<Items*> itemsList) { for (auto item : itemsList) { items.push_back(item); } }
 	vector<Items*> getItems() const { return items; };
 	sf::Sprite& getSprite() { return SChests; };
 

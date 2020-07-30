@@ -49,7 +49,7 @@ public:
 	int getStam() const { return stamina; };
 	sf::Sprite& getSprite() { return SHero; };
 
- 	void DrawCharacter(int heigh = 600, int width = 800);
+	void DrawCharacter(int heigh = 600, int width = 800);
 	void setPosition(int pos_x, int pos_y) { SHero.setPosition(pos_x, pos_y); };
 
 
